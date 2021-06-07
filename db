@@ -1,0 +1,32 @@
+exports.setupDb = () => {
+    return connection.getUserCollection().then( ( userCollection ) => {
+        return userCollection.deleteMany().then( () => {
+            return userCollection.insertMany( userData ).then( () => {
+                return connection.getBookingCollection().then( ( bookingCollection )=>{
+                    return bookingCollection.deleteMany().then( ()=>{
+                        return bookingCollection.insertMany( bookingData ).then( ()=>{
+                            return connection.getDestinationCollection().then( ( destCollection )=>{
+                                return destCollection.deleteMany().then( ()=>{
+                                    return destCollection.insertMany( destinationData ).then( ()=>{
+                                        return connection.getHotdealCollection().then( ( hotdCollection )=>{
+                                            return hotdCollection.deleteMany().then( ()=>{
+                                                return hotdCollection.insertMany( hotDealData ).then( ( data )=>{
+                                                    if( data ) {
+                                                        return"Insertion Successfull"
+                                                    } else{
+                                                        throw new Error( "Insertion failed" )
+                                                    }
+                                                } )
+                                            } )
+                                        } )
+                                    } )
+                                } )
+                            } )
+                        } )
+                    } )
+                } )
+            } )
+        } )
+
+    } )
+}
