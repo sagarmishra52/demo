@@ -1,0 +1,391 @@
+const { expect } = require('chai'); // Library to clean and easy syntax
+const request = require('supertest'); //library for http agent
+const userModel= require('../src/model/userslogin')
+
+
+describe('checking get hot deals method of model', async() => {
+    it('checking data should not be Null', async() => {
+        let data=await userModel.getHotDeals()
+        expect(data).not.to.equal(null);
+    });
+    it('checking  the data', async() => {
+        let data=await userModel.getHotDeals()
+        expect(data).to.have.length.greaterThan(0);
+    });
+   
+})
+
+
+
+describe('checking get package by search method of model', async() => {
+    it('checking the destination id', async() => {
+        let data=await userModel.getDestinationByContinent("Delhi")
+        expect(data[0].destinationId).to.equal("D1001");
+    });
+    it('checking the discount of the package', async() => {
+        let data=await userModel.getDestinationByContinent("Delhi")
+        expect(data[0].discount).to.equal(0);
+    });
+    it('checking no of Nights', async() => {
+        let data=await userModel.getDestinationByContinent("Delhi")
+        expect(data[0]).to.have.property("noOfNights")
+    });
+    it('checking the discount of the package', async() => {
+        let data=await userModel.getDestinationByContinent("Europe")
+        expect(data).to.equal(null);
+    });
+})
+
+
+
+describe('Generating the userId', async() => {
+   
+    it( 'checking the booking Id of type String', async() => {
+    let data=await userModel.generateBookingId()
+    expect(data).be.a('String');
+    })
+
+    it( 'checking the Booking Id not to be NULL', async() => {
+   
+        let data=await userModel.generateBookingId()
+     expect(data).not.to.equal(null);
+});
+
+it('Booking Id should start with B',async()=>{
+  let data=await userModel.generateBookingId()
+ expect(data[0]).to.equal('B');
+})
+});
+
+
+describe('Generating the userId', async() => {
+
+    it('checking the booking Id of type String', async() => {
+        let data=await userModel.generateUserId()
+        expect(data).be.a('String')
+    });
+
+    it('checking the User Id not to be NULL', async() => {
+        let data=await userModel.generateUserId()
+        expect(data).not.to.equal(null);
+    });
+
+    it('User Id should start with U', async() => {
+        let data=await userModel.generateUserId()
+        expect(data[0]).to.equal('U');
+    });
+
+});
+
+
+
+//check user method
+describe('checking check user method of model', async() => {
+    it('checking contact no', async() => {
+        let data=await userModel.checkUser(9098765432);
+        expect(data.userId).to.equal('U1001');
+    });
+    it('checking contact no', async() => {
+        let data=await userModel.checkUser(9098765438);
+        expect(data).to.equal(null);
+    });
+});
+
+//get password method
+describe('checking get password method of model', async() => {
+    it('checking password sholud not be null', async() => {
+        let data=await userModel.getPassword(9098765432);
+        expect(data).not.to.equal(null);
+    });
+    it('checking password length greater than 0', async() => {
+        let data=await userModel.getPassword(9098765432);
+        expect(data).to.have.length.greaterThan(0);
+    });
+    it('checking password sholud not be null', async() => {
+        let data=await userModel.getPassword(9098765438);
+        expect(data).to.equal(null);
+    });
+});
+
+//validate user method
+describe('checking validate user method of model', async() => {
+    it('checking user Id', async() => {
+        let data=await userModel.validateUser(9098765432);
+        expect(data).to.equal('U1001');
+    });
+    it('checking user Id', async() => {
+        let data=await userModel.validateUser(9098765437);
+        expect(data).to.equal(null);
+    });
+    it('checking destination Id',async()=>{
+        let data = await userModel.getDestinationById("HD1001")
+        expect(data.length).not.to.equal(0)
+    })
+});
+
+
+
+describe('Getting the booking details by userId', async() => {
+    it('getting the data with the help of userId', async() => {
+        let data=await userModel.getBookingOfUser("U1001")
+        expect(data).not.to.equal(null);
+    });
+
+    it('checking the mandatory fields of bookings', async() => {
+        let data=await userModel.getBookingOfUser("U1002")
+        expect(data[0]).to.have.property("destinationName");
+    });
+
+    it('checking the UserId be a type of String', async() => {
+        let data=await userModel.getBookingOfUser("U1002")
+        //expect(data[0]).to.have.property("destinationN");
+        expect(data[0].userId).be.a('String')
+    });
+});
+
+
+
+describe('Getting the details of the bookings', async() => {
+   
+//     it('getting the data with the help of bookingId', async() => {
+//    let data=await userModel.getBookingOfUser("B1002")
+//         expect(data).not.to.equal(null);
+//     });
+
+    it('checking the no of persons who can do booking', async() => {
+        let data=await userModel.getBookingOfUser("U1001")
+             expect(data).not.to.equal(null);
+         });
+
+
+        //  it('booking data should have userId', async() => {
+        //     let data=await userModel.getBookingOfUser("B1003")
+        //          expect(data).to.have.property("userId");
+        //      });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+const { expect } = require('chai'); // Library to clean and easy syntax
+const request = require('supertest'); //library for http agent 
+const app1=require("../src/app")
+
+
+describe('testing package router file', async () => {
+        it('test case', async() => {
+               let res=await request(app1).get("/package/getDetails/A1001")
+              expect(res.status).to.equal(404);
+             });
+             it('test case', async() => {
+                let res=await request(app1).get("/getPackages/D1001")
+               expect(res.type).to.equal("text/html");
+              });
+
+             it('test case', async() => {
+                let res=await request(app1).get("/package//destinations/Central India")
+               expect(res.status).to.equal(200);
+              });
+
+              it('test case', async() => {
+                let res=await request(app1).get("/package//destinations/Bihar")
+               expect(res.status).to.equal(500);
+              });
+        
+        
+             it('test case', async() => {
+                let res=await request(app1).get("/package/getDetails/D1002")
+                expect(res.status).to.equal(200);
+              });
+        
+              it('test case', async() => {
+                let res=await request(app1).get("/package/getDetails/:destinationId")
+                expect(res.redirect).not.to.equal(true);
+              });
+    
+    
+})
+
+
+describe('testing package router file', async () => {
+  it('test case', async() => {
+         let res=await request(app1).get("/package/hotDeals")
+         expect(res.body.message).not.to.equal("Cannot fetch the data from hot deals");
+       });
+  
+       it('test case', async() => {
+          let res=await request(app1).get("/package/hotDeals")
+          expect(res.status).to.equal(200);
+        });
+      });
+
+
+describe('testing user router file', async () => {
+it('checking the setup path', async() => {
+      let res=await request(app1).get("/user/setup")
+      expect(res.json).not.to.equal("Cannot fetch the data from hot deals");
+    });
+
+    it('checking for status code', async() => {
+       let res=await request(app1).get("/user/setup");
+       expect(res.status).to.equal(200);
+     });   
+});
+
+describe('testing booking router file', async () => {
+   it('test case', async() => {
+          let res=await request(app1).get("/book/getBookings/:userId")
+          expect(res.body.message).not.to.equal("Cannot fetch the data from User Collection");
+        });
+   
+        it('test case', async() => {
+           let res=await request(app1).get("/book/getBookings/:userId")
+           expect(res.charset).to.equal('utf-8');
+           
+         });
+      
+         
+        it('test case', async() => {
+           let res=await request(app1).get("/book/getBookings/:userId")
+           expect(res.type).to.equal('application/json');
+         });
+
+
+       });
+       describe("Testing Register route from app", async ()=> {
+        it("checking if same user throws error", async() => {
+            var obj ={ userId: "U1001",name: "abc",emailId: "abc@gmail.com", contactNo: 9098765432,password:"Abc@1234" ,bookings:[] }//change
+            let res = await request(app1).post("/user/register").send(obj)
+
+            expect(res.error.text).to.equal('{"message":"User already exists with given contact number"}')
+        });
+        it("checking if same user throws error", async() => {
+          var obj ={ userId: "U1005",name: "abc",emailId: "abcd@gmail.com", contactNo: 9098765434,password:"Abc@1234" ,bookings:[] }//change
+          let res = await request(app1).post("/user/register").send(obj)
+
+          expect(res.error.text).not.to.equal('{"message":"User already exists with given contact number"}')
+      });
+    });
+
+
+
+
+
+
+
+const { expect } = require('chai');
+const request = require('supertest'); 
+const userService= require('../src/service/userslogin')
+
+describe('checking get hot deals method of Service', async() => {
+    it('checking first destination id', async() => {
+        let data=await userService.getHotDeals()
+        expect(data[0].destinationId).to.equal("HD1001");
+    });
+    it('checking the data to not be null', async() => {
+        let data=await userService.getHotDeals()
+        expect(data).not.to.equal(null);
+    });
+    it('getting the continent', async() => {
+        let data=await userService.getHotDeals()
+        expect(data[0].continent).to.be.a('string');
+    });
+})
+
+describe('checking get package by search method of service', async() => {
+    it('checking the data should not be NULL', async() => {
+        let data=await userService.getDestinationByContinent("Delhi")
+        expect(data).not.to.equal(null)
+    });
+    it('getting the destination id', async() => {
+        let data=await userService.getDestinationByContinent("Delhi")
+        expect(data[0].destinationId).to.equal("D1001");
+    });
+    it('checking the flight charges', async() => {
+        let data=await userService.getDestinationByContinent("Delhi")
+        expect(data[0].flightCharges).to.equal(4360);
+    });
+    it('checking the availability', async() => {
+        let data=await userService.getDestinationByContinent("Delhi")
+        expect(data[0].availability).to.equal(30);
+    });
+})
+
+describe('checking login method of service', async() => {
+    it('checking login credentials', async() => {
+        let data=await userService.login(9098765432,"Abc@1234");
+        expect(data).not.to.equal(null);
+    });
+
+
+    it('checking contact no', async() => {
+        let data=await userService.login(9098765432,"Abc@1234");
+        expect(data).to.have.property('contactNo');
+    });
+    it('getting user Id', async() => {
+        let data=await userService.login(9098765432,"Abc@1234");
+        expect(data.userId).to.equal('U1001');
+    });
+});
+
+
+describe('checking get booking deals method of service', async() => {
+    it('checking the no of persons who can do the booking', async() => {
+        let data=await userService.getBookingOfUser("U1001")
+        expect(data[0].noOfPersons).lt(5);
+    });
+
+    it('booking deal data should not be null', async() => {
+        let data=await userService.getBookingOfUser("U1001")
+         expect(data).not.to.equal(null);
+    });
+
+    
+
+    it('the booking must have destination id', async() => {
+        let data=await userService.getBookingOfUser("U1001")
+        expect(data[0]).to.have.property("destId");
+    });
+});
+
+
+describe('Deleting the booking', async() => {
+    it('deleting the booking Id', async() => {
+        let data=await userService.cancelBooking("B1001")
+        expect(data.deletedCount).gt(0);
+    });
+});
+describe("checking bookPackage method of service",async ()=>{
+    it("checking if booking gets added", async() =>{
+        var obj={
+            "userId": "U1001",
+            "destId": "D1001",
+            "destinationName": "Explore Delhi and Agra",
+            "checkInDate": "2021-12-09",
+            "checkOutDate": "2021-12-16",
+            "noOfPersons": 2,
+            "totalCharges": 59998
+        
+       
+        }
+
+        let data=await userService.bookPackage(obj)
+        expect(data[0].userId).to.equal("U1001") //check
+    })
+})
+
+describe("checking cancel Booking method of service",async ()=>{
+    it("checking if booking gets deleted", async() =>{
+        let data=await userService.cancelBooking('B1004') //check
+        expect(data.deletedCount).to.equal(1)
+    })
+})
